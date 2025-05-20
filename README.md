@@ -15,7 +15,8 @@ The agent expects the following environment variables:
 
 When the `openai_agents` package is installed and imported, `run_agent()` will
 construct an `Agent` with a set of tools to fetch jobs, generate queries,
-search the web and store leads. If the Agents SDK is not installed, it falls
+search the web, optionally fetch raw HTML pages using a custom `browse_page`
+tool and store leads. If the Agents SDK is not installed, it falls
 back to the
 original manual workflow.
 
