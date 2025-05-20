@@ -1,4 +1,4 @@
-import os, json
+import os
 from typing import Any
 from dotenv import load_dotenv
 from supabase import create_client
@@ -13,7 +13,7 @@ client = create_client(
 
 # --- tool: fetch_targets --------------------------------------------
 @function_tool
-def fetch_targets() -> list[Any]:
+def fetch_targets() -> list[dict[str, Any]]:
     """Return every un-processed row in the targets table."""
     return (
         client.table("targets")
