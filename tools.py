@@ -2,8 +2,8 @@ import os, json
 from dotenv import load_dotenv
 from supabase import create_client
 from agents import Tool
-import openai.tools as oat   # built-in browsing tools
 
+from agents import WebSearchTool
 load_dotenv()                             # read .env once
 
 # --- Supabase client -------------------------------------------------
@@ -54,4 +54,14 @@ mark_processed = Tool(
 
 # --- built-in OpenAI browsing tool ----------------------------------
 # exposes `browser.search` automatically
-web_search = oat.web_search         # ← comes from the SDK docs
+web_search = WebSearchTool()
+
+TOOLS = [
+    fetch_targets,
+    insert_lead,
+    mark_processed,
+    web_search,
+]
+
+__all__ = ["fetch_targets", "insert_lead", "mark_processed", "web_search", "TOOLS"]
+

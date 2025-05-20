@@ -1,6 +1,6 @@
 import os, json, openai
-import agents as openai_agents
-from tools import fetch_targets, insert_lead, mark_processed, web_search
+from agents import Agent, OpenAIResponsesModel, Runner
+from tools import TOOLS
 
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
@@ -14,18 +14,19 @@ For each target from fetch_targets():
 3. Call browser.search(query) to get live results.
 4. For each result item (title, link, snippet), call insert_lead().
 5. Call mark_processed(target_id) when done.
-
 Return nothing else.
 """
 
-agent = openai_agents.Agent.from_openai(
+agent = Agent(
     name="lead-gen-agent",
-    model="gpt-4o",
-    tools=[fetch_targets, web_search, insert_lead, mark_processed],
+    model=OpenAIResponsesModel("gpt-4o-mini"),
+    tools=TOOLS,
     system_message=SYSTEM,
 )
 
+
 if __name__ == "__main__":
-    result = agent.run("start")
-    print(result.logs)      # full tool-call trace
+    import asyncio
+    result = asyncio.run(Runner.run(agent, "start"))
+    print(result.final_output)
 
