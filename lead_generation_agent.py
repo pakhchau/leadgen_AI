@@ -184,11 +184,13 @@ def run_agent() -> None:
 
     # If the Agents SDK is unavailable fall back to the original manual loop.
     if Agent is None or Tool is None:
-        jobs = fetch_jobs(client)
-        for job in jobs:
-            leads = search_leads(job)
+        targets = fetch_jobs(client)
+        print(f"\U0001F50D Found {len(targets)} targets to process.")
+        for t in targets:
+            leads = search_leads(t)
             store_leads(client, leads)
-            mark_job_processed(client, job)
+            print(f"[Target {t.id}] Inserted {len(leads)} leads")
+            mark_job_processed(client, t)
         return
 
     tools = [
