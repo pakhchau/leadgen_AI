@@ -35,6 +35,13 @@ OPENAI_KEY_ENV = "OPENAI_API_KEY"
 JOB_TABLE = "targets"
 LEADS_TABLE = "leads"
 
+
+def create_chat_completion(**kwargs: Any) -> Any:
+    """Compatibility wrapper to support both old and new OpenAI APIs."""
+    if hasattr(openai, "chat") and hasattr(openai.chat, "completions"):
+        return openai.chat.completions.create(**kwargs)
+    return openai.ChatCompletion.create(**kwargs)
+
 @dataclass
 class Target:
     """Represents a single lead generation target."""
@@ -87,7 +94,7 @@ def generate_query(job: Target) -> str:
         {"role": "user", "content": f"Target name: {job.name}. Criteria: {job.criteria}"},
     ]
 
-    resp = openai.ChatCompletion.create(
+    resp = create_chat_completion(
         model="gpt-3.5-turbo-0613",
         messages=messages,
         temperature=0.2,
@@ -115,7 +122,7 @@ def search_web(query: str) -> List[dict[str, Any]]:
         {"role": "user", "content": query},
     ]
 
-    resp = openai.chat.completions.create(
+    resp = create_chat_completion(
         model="gpt-3.5-turbo-1106",
         messages=messages,
         response_format={"type": "json_object"},
