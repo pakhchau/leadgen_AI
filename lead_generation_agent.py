@@ -14,7 +14,6 @@ from dataclasses import dataclass
 from typing import Any, List
 
 from supabase import create_client, Client
-import requests
 import openai
 import json
 
@@ -31,7 +30,6 @@ except Exception:  # pragma: no cover - optional dependency
 SUPABASE_URL_ENV = "SUPABASE_URL"
 SUPABASE_KEY_ENV = "SUPABASE_SERVICE_ROLE_KEY"
 OPENAI_KEY_ENV = "OPENAI_API_KEY"
-SEARCH_API_KEY_ENV = "SEARCH_API_KEY"
 
 # Table names used by this agent
 JOB_TABLE = "targets"
@@ -100,24 +98,40 @@ def generate_query(job: Target) -> str:
 
 
 def search_web(query: str) -> List[dict[str, Any]]:
-    """Perform a web search using the external search API."""
+    """Perform a web search using OpenAI's built-in browsing tool."""
 
-    search_key = os.getenv(SEARCH_API_KEY_ENV)
-    if not search_key:
-        raise RuntimeError(f"{SEARCH_API_KEY_ENV} environment variable not set")
+    openai.api_key = os.getenv(OPENAI_KEY_ENV)
+    if not openai.api_key:
+        raise RuntimeError("OPENAI_API_KEY environment variable not set")
 
-    response = requests.get(
-        "https://example.com/search",
-        params={"q": query, "api_key": search_key},
-        timeout=10,
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "Use web search to gather leads. Return results as JSON in the "
+                'format {"results": [...]}.'
+            ),
+        },
+        {"role": "user", "content": query},
+    ]
+
+    resp = openai.chat.completions.create(
+        model="gpt-3.5-turbo-1106",
+        messages=messages,
+        response_format={"type": "json_object"},
+        tools=[{"type": "web_search"}],
     )
-    response.raise_for_status()
-    results = response.json().get("results", [])
+
+    try:
+        results = json.loads(resp.choices[0].message.content)["results"]
+    except Exception:
+        results = []
     return results
 
 
 def insert_lead(client: Client, job: Target, lead_data: dict[str, Any]) -> None:
     """Insert a single lead row into the database."""
+
 
     store_leads(client, [Lead(target_id=job.id, data=lead_data)])
 
