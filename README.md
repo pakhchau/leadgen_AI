@@ -68,4 +68,15 @@ import openai
 Alternatively, simply use `lead_generation_agent.py`, which imports it
 automatically. A minimal example is provided in `test_env.py`.
 
-See the docstrings in `lead_generation_agent.py` for details.
+## Running the agent
+
+After configuring your environment variables, start the agent with the
+interpreter from your virtual environment:
+
+```bash
+./venv/bin/python lead_generation_agent.py
+```
+
+This will process any unprocessed targets from Supabase and insert newly
+discovered leads. See the docstrings in `lead_generation_agent.py` for
+further details.
