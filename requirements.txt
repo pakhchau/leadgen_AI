@@ -1,0 +1,5 @@
+python-dotenv
+supabase
+openai>=1.0.0
+openai-agents
+requests
