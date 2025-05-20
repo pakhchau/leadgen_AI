@@ -87,7 +87,7 @@ def generate_query(job: Target) -> str:
         {"role": "user", "content": f"Target name: {job.name}. Criteria: {job.criteria}"},
     ]
 
-    resp = openai.ChatCompletion.create(
+    resp = openai.chat.completions.create(
         model="gpt-3.5-turbo-0613",
         messages=messages,
         temperature=0.2,
