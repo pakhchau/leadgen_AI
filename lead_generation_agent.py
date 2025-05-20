@@ -32,12 +32,12 @@ except Exception:
 
 
 try:
-    # The openai-agents package exposes its functionality via the
-    # ``openai_agents`` module rather than ``openai.agents``. Importing the
-    # top-level module registers the Agent/Tool API and makes the classes
+    # The OpenAI Agents SDK exposes its functionality via the ``agents``
+    # package (older versions documented it as ``openai_agents``). Importing
+    # the top-level module registers the Agent/Tool API and makes the classes
     # available for import.
-    import openai_agents  # noqa: F401
-    from openai_agents import Agent, Tool
+    import agents  # noqa: F401
+    from agents import Agent, Tool
 except Exception:  # pragma: no cover - optional dependency
     Agent = None  # type: ignore
     Tool = None   # type: ignore

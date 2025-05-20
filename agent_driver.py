@@ -1,4 +1,5 @@
-import os, json, openai, openai_agents
+import os, json, openai
+import agents as openai_agents
 from tools import fetch_targets, insert_lead, mark_processed, web_search
 
 openai.api_key = os.environ["OPENAI_API_KEY"]

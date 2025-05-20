@@ -22,7 +22,8 @@ OPENAI_API_KEY=...
 
 No SerpAPI key needed.
 
-When the `openai_agents` package is installed and imported, `run_agent()` will
+When the `openai-agents` package is installed it exposes its functionality
+through the `agents` module. When imported, `run_agent()` will
 construct an `Agent` with a set of tools to fetch jobs, generate queries,
 search the web, optionally fetch raw HTML pages using a custom `browse_page`
 tool and store leads. If the Agents SDK is not installed, it falls
@@ -32,12 +33,12 @@ original manual workflow.
 You can verify the package is available with:
 
 ```bash
-python -c "import openai_agents, supabase, requests; print('OK')"
+python -c "import agents, supabase, requests; print('OK')"
 ```
 
 ## Using the virtual environment
 
-If you receive `ModuleNotFoundError: openai_agents`, ensure that the
+If you receive `ModuleNotFoundError: agents`, ensure that the
 interpreter you are invoking is the one from your virtual environment.
 Check with:
 
@@ -57,8 +58,8 @@ or call the venv's interpreter explicitly:
 
 ```bash
 ./venv/bin/python - <<'EOF'
-import openai_agents
-print("Loaded:", openai_agents)
+import agents
+print("Loaded:", agents)
 EOF
 ```
 
