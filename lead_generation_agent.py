@@ -156,6 +156,8 @@ def search_web(query: str) -> List[dict[str, Any]]:
         }
     ]
 
+    print("🔎 Searching web for query:", query)
+
     resp = create_chat_completion(
         model="gpt-4o",
         messages=messages,
@@ -168,6 +170,13 @@ def search_web(query: str) -> List[dict[str, Any]]:
         results = json.loads(resp.choices[0].message.content)["results"]
     except Exception:
         results = []
+
+    if results:
+        print("🌐 Search results:")
+        for idx, item in enumerate(results, 1):
+            url = item.get("url") or item.get("link") or item.get("source", "<no url>")
+            print(f"  {idx}. {url}")
+
     return results
 
 
