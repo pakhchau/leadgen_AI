@@ -139,11 +139,29 @@ def search_web(query: str) -> List[dict[str, Any]]:
         {"role": "user", "content": query},
     ]
 
+    functions = [
+        {
+            "name": "search_web",
+            "description": "Perform a web search and return results",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The search query string",
+                    }
+                },
+                "required": ["query"],
+            },
+        }
+    ]
+
     resp = create_chat_completion(
         model="gpt-4o",
         messages=messages,
         response_format={"type": "json_object"},
-        tools=[{"type": "web_search"}],
+        functions=functions,
+        function_call={"name": "search_web"},
     )
 
     try:
