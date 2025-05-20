@@ -13,10 +13,17 @@ The agent expects the following environment variables:
 - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for database access.
 - `OPENAI_API_KEY` for generating search queries and performing web searches.
 
-When the `openai.agents` package is available, `run_agent()` will construct
-an `Agent` with a set of tools to fetch jobs, generate queries, search the web
-and store leads. If the Agents SDK is not installed, it falls back to the
+When the `openai_agents` package is installed and imported, `run_agent()` will
+construct an `Agent` with a set of tools to fetch jobs, generate queries,
+search the web and store leads. If the Agents SDK is not installed, it falls
+back to the
 original manual workflow.
+
+You can verify the package is available with:
+
+```bash
+python -c "import openai_agents, supabase, requests; print('OK')"
+```
 
 ## Compatibility
 
