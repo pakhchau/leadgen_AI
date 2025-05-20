@@ -1,7 +1,7 @@
 import os, json
 from dotenv import load_dotenv
 from supabase import create_client
-from openai_agents import Tool
+from agents import Tool
 import openai.tools as oat   # built-in browsing tools
 
 load_dotenv()                             # read .env once
