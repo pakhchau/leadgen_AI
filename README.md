@@ -25,6 +25,33 @@ You can verify the package is available with:
 python -c "import openai_agents, supabase, requests; print('OK')"
 ```
 
+## Using the virtual environment
+
+If you receive `ModuleNotFoundError: openai_agents`, ensure that the
+interpreter you are invoking is the one from your virtual environment.
+Check with:
+
+```bash
+which python
+which python3
+```
+
+Both should point inside `./venv/bin/`. If they do not, either activate the
+environment with:
+
+```bash
+source venv/bin/activate
+```
+
+or call the venv's interpreter explicitly:
+
+```bash
+./venv/bin/python - <<'EOF'
+import openai_agents
+print("Loaded:", openai_agents)
+EOF
+```
+
 ## Compatibility
 
 For projects that still call `openai.ChatCompletion.create` directly, the
@@ -41,4 +68,15 @@ import openai
 Alternatively, simply use `lead_generation_agent.py`, which imports it
 automatically. A minimal example is provided in `test_env.py`.
 
-See the docstrings in `lead_generation_agent.py` for details.
+## Running the agent
+
+After configuring your environment variables, start the agent with the
+interpreter from your virtual environment:
+
+```bash
+./venv/bin/python lead_generation_agent.py
+```
+
+This will process any unprocessed targets from Supabase and insert newly
+discovered leads. See the docstrings in `lead_generation_agent.py` for
+further details.
