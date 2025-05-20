@@ -13,8 +13,8 @@ client = create_client(
 
 # --- tool: fetch_targets --------------------------------------------
 @function_tool
-def fetch_targets() -> list[dict[str, Any]]:
-    """Return every un-processed row in the targets table."""
+def fetch_targets() -> list[dict]:
+    """All un-processed targets"""
     return (
         client.table("targets")
               .select("*")
@@ -26,11 +26,12 @@ def fetch_targets() -> list[dict[str, Any]]:
 # --- tool: insert_lead ----------------------------------------------
 @function_tool
 def insert_lead(target_id: int, lead: Any) -> int:
+    """Insert one lead and return row id"""
     out = (
         client.table("leads")
-              .insert({"target_id": target_id, "lead_data": lead})
-              .execute()
-              .data
+               .insert({"target_id": target_id, "lead_data": lead})
+               .execute()
+               .data
     )
     return out[0]["id"]
 

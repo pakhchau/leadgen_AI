@@ -1,6 +1,6 @@
 import os, asyncio, openai
 from agents import Agent, Runner
-from agents.models import OpenAIResponsesModel
+from agents.models.openai_responses import OpenAIResponsesModel
 from tools import TOOLS
 
 openai_client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
