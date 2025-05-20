@@ -17,6 +17,7 @@ from supabase import create_client, Client
 import openai
 import json
 
+
 # Apply compatibility patch for `openai.ChatCompletion.create` when using
 # `openai` version 1.x. The `openai_compat` module performs the patch at import
 # time and is a no-op for older versions.
@@ -24,6 +25,7 @@ try:  # pragma: no cover - optional dependency
     import openai_compat  # noqa: F401
 except Exception:
     pass
+
 
 try:
     # The Agents SDK ships in newer versions of the openai package. Importing it
