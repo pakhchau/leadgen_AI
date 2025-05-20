@@ -1,5 +1,6 @@
-import os, json, openai
-from agents import Agent, OpenAIResponsesModel, Runner
+import os, asyncio, openai
+from agents import Agent, Runner
+from agents.models import OpenAIResponsesModel
 from tools import TOOLS
 
 openai_client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
@@ -17,18 +18,16 @@ For each target from fetch_targets():
 Return nothing else.
 """
 
-responses_model = OpenAIResponsesModel(openai_client, "gpt-4o")
+responses_model = OpenAIResponsesModel(openai_client, "gpt-4o-mini")
 
 agent = Agent(
+    responses_model,
+    TOOLS,
     name="lead-gen-agent",
-    model=responses_model,
-    tools=TOOLS,
-    system_message=SYSTEM,
+    instructions=SYSTEM,
 )
 
 
 if __name__ == "__main__":
-    import asyncio
-    result = asyncio.run(Runner.run(agent, "start"))
-    print(result.final_output)
+    asyncio.run(Runner.run(agent, "start"))
 
