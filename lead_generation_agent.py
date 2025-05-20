@@ -17,6 +17,15 @@ from supabase import create_client, Client
 import openai
 import json
 
+# Provide backward compatibility for code that still calls
+# ``openai.ChatCompletion.create`` in environments with ``openai>=1``.
+if hasattr(openai, "chat") and hasattr(openai.chat, "completions"):
+    openai.ChatCompletion = type(
+        "ChatCompletionCompat",
+        (),
+        {"create": staticmethod(openai.chat.completions.create)},
+    )
+
 try:
     # The Agents SDK ships in newer versions of the openai package. Importing it
     # conditionally keeps this module compatible with older releases that lack
