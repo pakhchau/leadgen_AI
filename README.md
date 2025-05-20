@@ -22,8 +22,16 @@ original manual workflow.
 
 For projects that still call `openai.ChatCompletion.create` directly, the
 `openai_compat` module patches this method to forward requests to the new
-`openai.chat.completions.create` function introduced in `openai>=1`. Import the
-module before making OpenAI API calls or simply rely on
-`lead_generation_agent.py`, which imports it automatically.
+`openai.chat.completions.create` function introduced in `openai>=1`.
+
+Make sure to import ``openai_compat`` **before** issuing any API calls:
+
+```python
+import openai_compat  # applies the patch
+import openai
+```
+
+Alternatively, simply use `lead_generation_agent.py`, which imports it
+automatically. A minimal example is provided in `test_env.py`.
 
 See the docstrings in `lead_generation_agent.py` for details.
