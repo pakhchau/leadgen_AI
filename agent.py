@@ -14,5 +14,4 @@ from lead_generation_agent import run_agent
 
 
 if __name__ == "__main__":  # pragma: no cover - manual entry point
-=======
-if __name__ == "__main__":
+    run_agent()
