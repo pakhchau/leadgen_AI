@@ -22,6 +22,9 @@ OPENAI_API_KEY=...
 
 No SerpAPI key needed.
 
+Run the provided `setup.sh` script to install dependencies. It installs
+pre-built wheels only (via `--only-binary`) to avoid expensive source builds.
+
 When the `openai_agents` package is installed and imported, `run_agent()` will
 construct an `Agent` with a set of tools to fetch jobs, generate queries,
 search the web, optionally fetch raw HTML pages using a custom `browse_page`
