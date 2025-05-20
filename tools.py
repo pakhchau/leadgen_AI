@@ -38,7 +38,10 @@ def insert_lead(target_id: int, lead: Any) -> int:
 # --- tool: mark_processed -------------------------------------------
 @function_tool
 def mark_processed(target_id: int) -> bool:
-    client.table("targets").update({"processed": True}).eq("id", target_id).execute()
+    client.table("targets") \
+        .update({"processed": True}) \
+        .eq("id", target_id) \
+        .execute()
     return True
 
 # --- built-in OpenAI browsing tool ----------------------------------
