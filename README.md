@@ -25,6 +25,33 @@ You can verify the package is available with:
 python -c "import openai_agents, supabase, requests; print('OK')"
 ```
 
+## Using the virtual environment
+
+If you receive `ModuleNotFoundError: openai_agents`, ensure that the
+interpreter you are invoking is the one from your virtual environment.
+Check with:
+
+```bash
+which python
+which python3
+```
+
+Both should point inside `./venv/bin/`. If they do not, either activate the
+environment with:
+
+```bash
+source venv/bin/activate
+```
+
+or call the venv's interpreter explicitly:
+
+```bash
+./venv/bin/python - <<'EOF'
+import openai_agents
+print("Loaded:", openai_agents)
+EOF
+```
+
 ## Compatibility
 
 For projects that still call `openai.ChatCompletion.create` directly, the
