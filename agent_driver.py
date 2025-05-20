@@ -2,7 +2,7 @@ import os, json, openai
 from agents import Agent, OpenAIResponsesModel, Runner
 from tools import TOOLS
 
-openai.api_key = os.environ["OPENAI_API_KEY"]
+openai_client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 SYSTEM = """
 You are a lead-generation agent.
@@ -17,9 +17,11 @@ For each target from fetch_targets():
 Return nothing else.
 """
 
+responses_model = OpenAIResponsesModel(openai_client, "gpt-4o")
+
 agent = Agent(
     name="lead-gen-agent",
-    model=OpenAIResponsesModel("gpt-4o-mini"),
+    model=responses_model,
     tools=TOOLS,
     system_message=SYSTEM,
 )
