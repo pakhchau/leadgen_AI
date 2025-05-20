@@ -20,7 +20,12 @@ Return nothing else.
 
 model = OpenAIResponsesModel(openai_client, "gpt-4o-mini")
 
-agent = Agent(model, TOOLS, name="lead-gen-agent", instructions=SYSTEM)
+# Pass parameters by keyword to avoid accidentally providing duplicate values
+# and to be compatible with different Agent versions.
+agent = Agent(model=model,
+              name="lead-gen-agent",
+              tools=TOOLS,
+              instructions=SYSTEM)
 
 
 if __name__ == "__main__":
