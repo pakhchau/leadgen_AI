@@ -15,6 +15,13 @@ The agent expects the following environment variables:
 - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for database access.
 - `OPENAI_API_KEY` for generating search queries and performing web searches.
 
+### .env
+SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+OPENAI_API_KEY=...
+
+No SerpAPI key needed.
+
 When the `openai_agents` package is installed and imported, `run_agent()` will
 construct an `Agent` with a set of tools to fetch jobs, generate queries,
 search the web, optionally fetch raw HTML pages using a custom `browse_page`

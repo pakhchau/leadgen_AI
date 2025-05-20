@@ -1,5 +1,5 @@
+openai-agents==0.0.15
+openai>=1.77
 python-dotenv
 supabase
-openai>=1.0.0
-openai-agents
 requests

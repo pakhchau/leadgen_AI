@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
-"""Compatibility wrapper for :mod:`lead_generation_agent`.
+"""Small wrapper to invoke :mod:`agent_driver`.
 
-This module previously contained a standalone implementation that returned
-dummy data via a ``web_search_stub`` function. It now simply delegates to the
-real agent in :mod:`lead_generation_agent`, which performs actual web searches
-and writes results to Supabase when proper credentials are configured.
-
-
+Historically this file implemented a manual workflow with a ``web_search_stub``
+helper. That logic has been removed in favour of the real Agent defined in
+``agent_driver.py``. The file is kept only for backward compatibility so that
+``python agent.py`` still works.
 """
 
-from lead_generation_agent import run_agent
+from agent_driver import agent
 
 
 if __name__ == "__main__":  # pragma: no cover - manual entry point
-    run_agent()
+    result = agent.run("start")
+    print(result.logs)
+
