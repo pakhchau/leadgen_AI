@@ -148,6 +148,24 @@ def search_web(query: str) -> List[dict[str, Any]]:
     return results
 
 
+def browse_page(url: str) -> str:
+    """Fetch raw HTML from a URL using ``requests``.
+
+    This serves as a simple example of wiring a custom web retrieval
+    function into the Agents SDK. It returns the page's text content or an
+    error string if the request fails.
+    """
+
+    import requests
+
+    try:
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        return resp.text
+    except Exception as exc:  # pragma: no cover - network errors
+        return f"Error fetching {url}: {exc}"
+
+
 def insert_lead(client: Client, job: Target, lead_data: dict[str, Any]) -> None:
     """Insert a single lead row into the database."""
 
@@ -201,6 +219,7 @@ def run_agent() -> None:
             "Build a web-search query using OpenAI",
         ),
         Tool("search_web", search_web, "Perform the actual HTTP search"),
+        Tool("browse_page", browse_page, "Fetch raw HTML from a URL"),
         Tool(
             "insert_lead",
             lambda job, lead: insert_lead(client, job, lead),
@@ -219,7 +238,8 @@ def run_agent() -> None:
         tools=tools,
         system_message=(
             "You are a lead generation agent. Fetch targets, generate search "
-            "queries, search the web, insert leads and mark jobs processed."
+            "queries, search the web, optionally fetch pages with `browse_page`, "
+            "insert leads and mark jobs processed."
         ),
     )
 
