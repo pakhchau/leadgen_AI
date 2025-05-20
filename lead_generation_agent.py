@@ -66,6 +66,7 @@ class Target:
     name: str
     criteria: str
     processed: bool
+    created_at: str
 
 @dataclass
 class Lead:
