@@ -3,9 +3,11 @@
 This repository contains a simple Python module for building an AI-driven
 lead generation agent using Supabase as a backend. The core logic lives in
 `lead_generation_agent.py` and demonstrates how you might pull lead generation
-jobs from a Supabase table, perform a web search and then
+jobs from a Supabase table, perform a web search and then store discovered
+leads back into the database. The short `agent.py` script now simply imports
+and calls `run_agent()` from this module for backward compatibility.
 
-store discovered leads back into the database. The module now includes an
+The module now includes an
 implementation of the **OpenAI Agents SDK** to orchestrate these steps.
 
 The agent expects the following environment variables:
