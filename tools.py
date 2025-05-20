@@ -1,4 +1,5 @@
 import os, json
+from typing import Any
 from dotenv import load_dotenv
 from supabase import create_client
 from agents import function_tool, WebSearchTool
@@ -12,7 +13,7 @@ client = create_client(
 
 # --- tool: fetch_targets --------------------------------------------
 @function_tool
-def fetch_targets() -> list[dict]:
+def fetch_targets() -> list[Any]:
     """Return every un-processed row in the targets table."""
     return (
         client.table("targets")
@@ -24,7 +25,7 @@ def fetch_targets() -> list[dict]:
 
 # --- tool: insert_lead ----------------------------------------------
 @function_tool
-def insert_lead(target_id: int, lead: dict) -> int:
+def insert_lead(target_id: int, lead: Any) -> int:
     out = (
         client.table("leads")
               .insert({"target_id": target_id, "lead_data": lead})
@@ -50,5 +51,5 @@ TOOLS = [
     web_search,
 ]
 
-__all__ = ["fetch_targets", "insert_lead", "mark_processed", "web_search", "TOOLS"]
+__all__ = ["TOOLS"]
 
