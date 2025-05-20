@@ -132,6 +132,7 @@ def search_web(query: str) -> List[dict[str, Any]]:
 def insert_lead(client: Client, job: Target, lead_data: dict[str, Any]) -> None:
     """Insert a single lead row into the database."""
 
+
     store_leads(client, [Lead(target_id=job.id, data=lead_data)])
 
 
