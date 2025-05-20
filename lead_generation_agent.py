@@ -3,8 +3,8 @@
 A simple AI agent framework to pull target specifications from a Supabase
 table, generate search queries using OpenAI, perform a web search and store
 discovered leads back to Supabase. This module uses `supabase-py` for database
-access and expects a search API for retrieving potential leads. Table and
-column names are aligned with the expected schema.
+access and leverages OpenAI's web-search tool for retrieving potential leads.
+Table and column names are aligned with the expected schema.
 """
 
 from __future__ import annotations
@@ -14,15 +14,22 @@ from dataclasses import dataclass
 from typing import Any, List
 
 from supabase import create_client, Client
-import requests
 import openai
 import json
+
+try:
+    # The Agents SDK ships in newer versions of the openai package. Importing it
+    # conditionally keeps this module compatible with older releases that lack
+    # the `openai.agents` submodule.
+    from openai.agents import Agent, Tool
+except Exception:  # pragma: no cover - optional dependency
+    Agent = None  # type: ignore
+    Tool = None   # type: ignore
 
 # Constants for environment variable names
 SUPABASE_URL_ENV = "SUPABASE_URL"
 SUPABASE_KEY_ENV = "SUPABASE_SERVICE_ROLE_KEY"
 OPENAI_KEY_ENV = "OPENAI_API_KEY"
-SEARCH_API_KEY_ENV = "SEARCH_API_KEY"
 
 # Table names used by this agent
 JOB_TABLE = "targets"
@@ -65,8 +72,8 @@ def fetch_jobs(client: Client) -> List[Target]:
     return jobs
 
 
-def search_leads(job: Target) -> List[Lead]:
-    """Use OpenAI and a web-search tool to find leads for a target."""
+def generate_query(job: Target) -> str:
+    """Generate a web-search query for a given target using OpenAI."""
 
     openai.api_key = os.getenv(OPENAI_KEY_ENV)
     if not openai.api_key:
@@ -77,50 +84,52 @@ def search_leads(job: Target) -> List[Lead]:
             "role": "system",
             "content": "You generate search queries for lead generation tasks.",
         },
-        {
-            "role": "user",
-            "content": f"Target name: {job.name}. Criteria: {job.criteria}",
-        },
-    ]
-
-    functions = [
-        {
-            "name": "search_web",
-            "description": "Perform a web search and return JSON results.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "search query string",
-                    }
-                },
-                "required": ["query"],
-            },
-        }
+        {"role": "user", "content": f"Target name: {job.name}. Criteria: {job.criteria}"},
     ]
 
     resp = openai.ChatCompletion.create(
         model="gpt-3.5-turbo-0613",
         messages=messages,
-        functions=functions,
-        function_call={"name": "search_web"},
+        temperature=0.2,
     )
 
-    query = json.loads(resp.choices[0].message.function_call.arguments)["query"]
+    query = resp.choices[0].message.content.strip()
+    return query
 
-    search_key = os.getenv(SEARCH_API_KEY_ENV)
-    if not search_key:
-        raise RuntimeError(f"{SEARCH_API_KEY_ENV} environment variable not set")
 
-    response = requests.get(
-        "https://example.com/search",
-        params={"q": query, "api_key": search_key},
-        timeout=10,
+def search_web(query: str) -> List[dict[str, Any]]:
+    """Perform a web search using OpenAI's built-in search tool."""
+
+    openai.api_key = os.getenv(OPENAI_KEY_ENV)
+    if not openai.api_key:
+        raise RuntimeError("OPENAI_API_KEY environment variable not set")
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo-0613",
+        messages=[{"role": "user", "content": query}],
+        tools=[{"type": "web_search"}],
+        tool_choice="auto",
     )
-    response.raise_for_status()
-    results = response.json().get("results", [])
 
+    # The web_search tool returns results in the `tool_calls` payload.
+    tool_calls = response.choices[0].message.tool_calls
+    if not tool_calls:
+        return []
+    results = json.loads(tool_calls[0].function.arguments)["results"]
+    return results
+
+
+def insert_lead(client: Client, job: Target, lead_data: dict[str, Any]) -> None:
+    """Insert a single lead row into the database."""
+
+    store_leads(client, [Lead(target_id=job.id, data=lead_data)])
+
+
+def search_leads(job: Target) -> List[Lead]:
+    """Use OpenAI and a web-search tool to find leads for a target."""
+
+    query = generate_query(job)
+    results = search_web(query)
     leads = [Lead(target_id=job.id, data=result) for result in results]
     return leads
 
@@ -139,14 +148,51 @@ def mark_job_processed(client: Client, job: Target) -> None:
 
 
 def run_agent() -> None:
-    """Main entry point for running the agent once."""
-    client = get_supabase_client()
-    jobs = fetch_jobs(client)
+    """Run the lead generation workflow using the OpenAI Agents SDK."""
 
-    for job in jobs:
-        leads = search_leads(job)
-        store_leads(client, leads)
-        mark_job_processed(client, job)
+    client = get_supabase_client()
+
+    # If the Agents SDK is unavailable fall back to the original manual loop.
+    if Agent is None or Tool is None:
+        jobs = fetch_jobs(client)
+        for job in jobs:
+            leads = search_leads(job)
+            store_leads(client, leads)
+            mark_job_processed(client, job)
+        return
+
+    tools = [
+        Tool("fetch_jobs", lambda: fetch_jobs(client), "Get unprocessed targets"),
+        Tool(
+            "generate_query",
+            generate_query,
+            "Build a web-search query using OpenAI",
+        ),
+        Tool("search_web", search_web, "Perform a web search using OpenAI"),
+        Tool(
+            "insert_lead",
+            lambda job, lead: insert_lead(client, job, lead),
+            "Write leads back to Supabase",
+        ),
+        Tool(
+            "mark_processed",
+            lambda job: mark_job_processed(client, job),
+            "Mark the job done",
+        ),
+    ]
+
+    agent = Agent.from_openai(
+        name="lead-gen-agent",
+        model="gpt-4o-mini",
+        tools=tools,
+        system_message=(
+            "You are a lead generation agent. Fetch targets, generate search "
+            "queries, search the web using OpenAI, insert leads and mark "
+            "jobs processed."
+        ),
+    )
+
+    agent.run()
 
 
 if __name__ == "__main__":
