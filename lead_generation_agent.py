@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """lead_generation_agent.py
 
 A simple AI agent framework to pull target specifications from a Supabase
@@ -8,6 +9,9 @@ column names are aligned with the expected schema.
 """
 
 from __future__ import annotations
+
+from dotenv import load_dotenv
+load_dotenv()
 
 import os
 from dataclasses import dataclass
