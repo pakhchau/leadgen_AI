@@ -20,7 +20,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 assert openai.api_key, "OPENAI_API_KEY missing in .env"
 
 resp = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo",
+    model="gpt-4o",
     messages=[{"role":"system","content":"Say hello"}],
     max_tokens=5
 )
