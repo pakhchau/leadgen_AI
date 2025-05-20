@@ -1,15 +1,27 @@
-"""Minimal example using ``openai_compat`` to maintain backwards compatibility."""
 
-import openai_compat  # noqa: F401 - patches openai.ChatCompletion
+#!/usr/bin/env python3
+import os
+from dotenv import load_dotenv
+from supabase import create_client
 import openai
 
-# Example call. This will fail without an API key but demonstrates the interface.
-if __name__ == "__main__":
-    try:
-        resp = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": "Hello"}],
-        )
-        print(resp)
-    except Exception as exc:
-        print("Request failed:", exc)
+load_dotenv()
+
+supa_url = os.getenv("SUPABASE_URL")
+supa_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+print("SUPABASE_URL =", supa_url)
+assert supa_url and supa_key, "Supabase vars missing in .env"
+
+client = create_client(supa_url, supa_key)
+res = client.table("targets").select("id").limit(1).execute()
+print("✅ Supabase responded (preview):", res.data)
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
+assert openai.api_key, "OPENAI_API_KEY missing in .env"
+
+resp = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[{"role":"system","content":"Say hello"}],
+    max_tokens=5
+)
+print("✅ OpenAI response:", resp.choices[0].message.content)
