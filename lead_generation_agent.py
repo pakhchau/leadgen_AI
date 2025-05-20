@@ -112,7 +112,7 @@ def generate_query(job: Target) -> str:
     ]
 
     resp = create_chat_completion(
-        model="gpt-3.5-turbo-0613",
+        model="gpt-4o",
         messages=messages,
         temperature=0.2,
     )
@@ -140,7 +140,7 @@ def search_web(query: str) -> List[dict[str, Any]]:
     ]
 
     resp = create_chat_completion(
-        model="gpt-3.5-turbo-1106",
+        model="gpt-4o",
         messages=messages,
         response_format={"type": "json_object"},
         tools=[{"type": "web_search"}],
@@ -239,7 +239,7 @@ def run_agent() -> None:
 
     agent = Agent.from_openai(
         name="lead-gen-agent",
-        model="gpt-4o-mini",
+        model="gpt-4o",
         tools=tools,
         system_message=(
             "You are a lead generation agent. Fetch targets, generate search "
